@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Delete Account{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="form-card text-center">
+    <h1>Delete Your Account?</h1>
+    <p class="text-muted">This will permanently delete your account and all your reviews. Your order history will be retained for our records.</p>
+    <p><strong>This action cannot be undone.</strong></p>
+    <form method="post" style="display:inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Yes, delete my account</button>
+    </form>
+    <a href="{% url 'profile' %}" class="btn btn-secondary" style="margin-left:0.75rem">Cancel</a>
+  </div>
+</div>
+{% endblock %}
