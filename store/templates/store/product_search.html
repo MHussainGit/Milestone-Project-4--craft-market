@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Search Results</h1>
+  {% if query %}
+    <p class="text-muted" style="font-family:var(--font-ui)">
+      Showing results for: <strong>{{ query }}</strong>
+    </p>
+  {% endif %}
+
+  <form class="search-form" method="get" action="{% url 'product_search' %}" role="search">
+    <label for="search-input" class="sr-only">Search products</label>
+    <input id="search-input" class="form-control" type="search" name="q" value="{{ query }}"
+           placeholder="Search by product or maker..." aria-label="Search products">
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+
+  {% if products %}
+    <div class="book-grid" role="list">
+      {% for product in products %}
+        <article class="card" role="listitem">
+          {% if product.image_url %}
+            <img class="card-img" src="{{ product.image_url }}" alt="{{ product.title }}" loading="lazy">
+          {% else %}
+            <div class="card-img" style="display:flex;align-items:center;justify-content:center;font-size:3rem" aria-hidden="true">&#9998;</div>
+          {% endif %}
+          <div class="card-body">
+            <h2 class="card-title" style="font-size:0.95rem">
+              <a href="{% url 'product_detail' slug=product.slug %}">{{ product.title }}</a>
+            </h2>
+            <p class="card-text">
+              <a href="{% url 'shop_detail' slug=product.shop.slug %}">{{ product.shop.name }}</a>
+            </p>
+            <p class="card-price">£{{ product.price }}</p>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% elif query %}
+    <p class="text-muted mt-2">No products found for "{{ query }}". <a href="{% url 'product_list' %}">Browse all products &rarr;</a></p>
+  {% else %}
+    <p class="text-muted mt-2">Enter a search term above.</p>
+  {% endif %}
+</div>
+{% endblock %}
