@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+
+{% block extra_head %}
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Checkout</h1>
+
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:2rem;align-items:start">
+
+    <div>
+      {% if not payment_step %}
+        <section class="card" style="padding:1.5rem;margin-bottom:1.5rem" aria-labelledby="shipping-heading">
+          <h2 id="shipping-heading" style="font-size:1.1rem;margin-bottom:1rem">Delivery Address</h2>
+          <form method="post" id="shipping-form" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}
+                  <span class="form-error" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Continue to Payment &rarr;</button>
+          </form>
+        </section>
+      {% else %}
+        <section class="card" style="padding:1.5rem" aria-labelledby="payment-heading">
+          <h2 id="payment-heading" style="font-size:1.1rem;margin-bottom:0.5rem">Payment Details</h2>
+          <p class="text-muted" style="font-size:0.85rem;font-family:var(--font-ui)">
+            Your card details are handled securely by Stripe. We never store card numbers.
+          </p>
+          <div class="form-group" style="margin-top:1rem">
+            <label for="card-element">Card details</label>
+            <div id="card-element" aria-label="Card input"></div>
+            <div id="card-errors" role="alert" aria-live="assertive"></div>
+          </div>
+          <button id="pay-btn" class="btn btn-primary" style="margin-top:0.75rem">
+            Pay £{{ total }}
+          </button>
+          <p class="text-muted mt-1" style="font-size:0.8rem;font-family:var(--font-ui)">
+            <a href="{% url 'checkout_cancel' %}">Cancel and return to cart</a>
+          </p>
+        </section>
+      {% endif %}
+    </div>
+
+    <aside class="card" style="padding:1.5rem" aria-labelledby="summary-heading">
+      <h2 id="summary-heading" style="font-size:1rem;margin-bottom:1rem">Order Summary</h2>
+      {% for item in cart_items %}
+        <div class="flex-between mb-1" style="font-family:var(--font-ui);font-size:0.85rem">
+          <span>{{ item.product.title }} &times; {{ item.quantity }}</span>
+          <span>£{{ item.line_total }}</span>
+        </div>
+      {% endfor %}
+      <hr style="border:none;border-top:1px solid var(--border);margin:0.75rem 0">
+      <div class="flex-between" style="font-weight:bold;font-family:var(--font-ui)">
+        <span>Total</span>
+        <span>£{{ total }}</span>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if payment_step %}
+<script>
+  const stripe = Stripe("{{ stripe_publishable_key }}");
+  const elements = stripe.elements();
+  const cardElement = elements.create("card", {
+    style: {
+      base: {
+        fontFamily: "system-ui, sans-serif",
+        fontSize: "16px",
+        color: "#2c2420",
+      }
+    }
+  });
+  cardElement.mount("#card-element");
+
+  cardElement.on("change", function(event) {
+    const errorDiv = document.getElementById("card-errors");
+    errorDiv.textContent = event.error ? event.error.message : "";
+  });
+
+  document.getElementById("pay-btn").addEventListener("click", async function() {
+    this.disabled = true;
+    this.textContent = "Processing…";
+    const errorDiv = document.getElementById("card-errors");
+    errorDiv.textContent = "";
+
+    let clientSecret;
+    try {
+      const res = await fetch("{% url 'create_payment_intent' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: JSON.stringify({ order_pk: {{ order.pk }} }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        errorDiv.textContent = data.error;
+        this.disabled = false;
+        this.textContent = "Pay £{{ total }}";
+        return;
+      }
+      clientSecret = data.client_secret;
+    } catch (err) {
+      errorDiv.textContent = "Network error. Please try again.";
+      this.disabled = false;
+      this.textContent = "Pay £{{ total }}";
+      return;
+    }
+
+    const result = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: { card: cardElement }
+    });
+
+    if (result.error) {
+      errorDiv.textContent = result.error.message;
+      this.disabled = false;
+      this.textContent = "Pay £{{ total }}";
+    } else if (result.paymentIntent.status === "succeeded") {
+      window.location.href = "{% url 'checkout_success' order_pk=order.pk %}";
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

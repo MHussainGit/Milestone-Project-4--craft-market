@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Payment Cancelled{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div style="max-width:480px;margin:3rem auto;text-align:center">
+    <div class="alert alert-info">
+      ℹ️ <strong>Payment was not taken.</strong>
+    </div>
+    <p class="text-muted">Your order has not been placed and no charge has been made to your card.</p>
+    <p class="text-muted">Your cart items are still saved — you can return to checkout at any time.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;margin-top:1.5rem">
+      <a href="{% url 'cart_detail' %}" class="btn btn-primary">Return to Cart</a>
+      <a href="{% url 'product_list' %}" class="btn btn-secondary">Browse Products</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

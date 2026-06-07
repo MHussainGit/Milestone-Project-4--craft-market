@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Order Confirmed{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div style="max-width:600px;margin:2rem auto">
+    <div class="alert alert-success" style="font-size:1.1rem;margin-bottom:1.5rem">
+      &#9989; <strong>Payment successful!</strong> Thank you for your order, {{ order.full_name }}.
+    </div>
+
+    <div class="card" style="padding:1.5rem">
+      <h1 style="font-size:1.3rem;margin-bottom:1rem">Order #{{ order.pk }}</h1>
+
+      <table class="table" aria-label="Order items">
+        <thead>
+          <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Qty</th>
+            <th scope="col">Price</th>
+            <th scope="col">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+            <tr>
+              <td>{{ item.product.title }}</td>
+              <td style="font-family:var(--font-ui)">{{ item.quantity }}</td>
+              <td style="font-family:var(--font-ui)">£{{ item.unit_price }}</td>
+              <td style="font-family:var(--font-ui);font-weight:600">£{{ item.get_line_total }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="text-align:right;font-weight:bold;font-family:var(--font-ui)">Total</td>
+            <td style="font-weight:bold;font-family:var(--font-ui)">£{{ order.get_total }}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div style="margin-top:1rem;font-family:var(--font-ui);font-size:0.9rem;color:var(--muted)">
+        <p><strong>Delivery to:</strong><br>
+          {{ order.full_name }}<br>
+          {{ order.address_line1 }}{% if order.address_line2 %}, {{ order.address_line2 }}{% endif %}<br>
+          {{ order.city }}, {{ order.postcode }}<br>
+          {{ order.country }}
+        </p>
+        <p>A confirmation email has been sent to <strong>{{ order.email }}</strong>.</p>
+      </div>
+    </div>
+
+    <div class="mt-2 flex-between">
+      <a href="{% url 'order_list' %}" class="btn btn-secondary">View all orders</a>
+      <a href="{% url 'product_list' %}" class="btn btn-primary">Continue shopping</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
