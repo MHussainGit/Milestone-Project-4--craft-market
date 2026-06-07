@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>Your Shopping Cart</h1>
+    <a href="{% url 'product_list' %}" class="btn btn-secondary btn-sm">&larr; Continue Shopping</a>
+  </div>
+
+  {% if cart_items %}
+    <table class="table" aria-label="Shopping cart contents">
+      <thead>
+        <tr>
+          <th scope="col">Product</th>
+          <th scope="col">Price</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Subtotal</th>
+          <th scope="col"><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart_items %}
+          <tr>
+            <td>
+              <strong>
+                <a href="{% url 'product_detail' slug=item.product.slug %}">{{ item.product.title }}</a>
+              </strong>
+              <br>
+              <span class="text-muted" style="font-size:0.8rem">
+                <a href="{% url 'shop_detail' slug=item.product.shop.slug %}">{{ item.product.shop.name }}</a>
+              </span>
+            </td>
+            <td style="font-family:var(--font-ui)">£{{ item.product.price }}</td>
+            <td>
+              <form method="post" action="{% url 'cart_update' product_pk=item.product.pk %}" style="display:flex;gap:0.4rem;align-items:center">
+                {% csrf_token %}
+                <label for="qty-{{ item.product.pk }}" class="sr-only">Quantity for {{ item.product.title }}</label>
+                <input id="qty-{{ item.product.pk }}" type="number" name="quantity" value="{{ item.quantity }}"
+                       min="1" max="{{ item.product.stock }}" class="form-control"
+                       style="width:70px;padding:0.3rem 0.5rem">
+                <input type="hidden" name="override" value="true">
+                <button type="submit" class="btn btn-secondary btn-sm">Update</button>
+              </form>
+            </td>
+            <td style="font-family:var(--font-ui);font-weight:600">£{{ item.line_total }}</td>
+            <td>
+              <form method="post" action="{% url 'cart_remove' product_pk=item.product.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm" aria-label="Remove {{ item.product.title }}">
+                  Remove
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="cart-total" aria-live="polite">
+      Total: £{{ total }}
+    </div>
+
+    <div class="mt-2 text-right">
+      {% if user.is_authenticated %}
+        <a href="{% url 'checkout' %}" class="btn btn-primary">Proceed to Checkout &rarr;</a>
+      {% else %}
+        <a href="{% url 'login' %}?next={% url 'checkout' %}" class="btn btn-primary">
+          Log in to Checkout
+        </a>
+      {% endif %}
+    </div>
+
+  {% else %}
+    <div class="text-center mt-3">
+      <p class="text-muted">Your cart is empty.</p>
+      <a href="{% url 'product_list' %}" class="btn btn-primary mt-2">Browse Products</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
