@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Order #{{ order.pk }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div style="max-width:640px;margin:0 auto">
+    <div class="page-header">
+      <h1>Order #{{ order.pk }}</h1>
+      <a href="{% url 'order_list' %}" class="btn btn-secondary btn-sm">&larr; My Orders</a>
+    </div>
+
+    <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+      <div class="flex-between mb-2">
+        <span class="text-muted" style="font-family:var(--font-ui);font-size:0.85rem">
+          Placed {{ order.created_at|date:"d F Y, H:i" }}
+        </span>
+        <span class="badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+      </div>
+
+      <table class="table" aria-label="Order items">
+        <thead>
+          <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Qty</th>
+            <th scope="col">Unit Price</th>
+            <th scope="col">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+            <tr>
+              <td>
+                <a href="{% url 'product_detail' slug=item.product.slug %}">{{ item.product.title }}</a>
+              </td>
+              <td style="font-family:var(--font-ui)">{{ item.quantity }}</td>
+              <td style="font-family:var(--font-ui)">£{{ item.unit_price }}</td>
+              <td style="font-family:var(--font-ui);font-weight:600">£{{ item.get_line_total }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="text-align:right;font-weight:bold;font-family:var(--font-ui)">Total</td>
+            <td style="font-weight:bold;font-family:var(--font-ui)">£{{ order.get_total }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="card" style="padding:1.5rem">
+      <h2 style="font-size:1rem;margin-bottom:0.75rem">Delivery Address</h2>
+      <address style="font-style:normal;font-family:var(--font-ui);font-size:0.9rem;line-height:1.8">
+        {{ order.full_name }}<br>
+        {{ order.address_line1 }}<br>
+        {% if order.address_line2 %}{{ order.address_line2 }}<br>{% endif %}
+        {{ order.city }}, {{ order.postcode }}<br>
+        {{ order.country }}
+      </address>
+    </div>
+  </div>
+</div>
+{% endblock %}
