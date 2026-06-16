@@ -23,7 +23,7 @@
       {% for product in products %}
         <article class="card" role="listitem">
           {% if product.image_url %}
-            <img class="card-img" src="{{ product.image_url }}" alt="{{ product.title }}" loading="lazy">
+            <img class="card-img" src="{{ product.image_src }}" alt="{{ product.title }}" loading="lazy">
           {% else %}
             <div class="card-img" style="display:flex;align-items:center;justify-content:center;font-size:3rem" aria-hidden="true">&#9998;</div>
           {% endif %}

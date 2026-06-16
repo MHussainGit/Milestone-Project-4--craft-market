@@ -3,9 +3,24 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.templatetags.static import static
 from django.utils.text import slugify
 
 User = get_user_model()
+
+
+def _resolve_image_src(image_url):
+    """Resolve a stored image reference to a usable ``src`` URL.
+
+    External (``http(s)://``) and root-relative (``/``) values are returned
+    unchanged; everything else is treated as a path under ``STATIC_URL`` and
+    resolved via ``static()`` so it works with hashed/manifest storage.
+    """
+    if not image_url:
+        return ""
+    if image_url.startswith(("http://", "https://", "/")):
+        return image_url
+    return static(image_url)
 
 
 class Category(models.Model):
@@ -40,6 +55,10 @@ class Shop(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def image_src(self):
+        return _resolve_image_src(self.image_url)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -104,6 +123,10 @@ class Product(models.Model):
                 counter += 1
             self.slug = slug
         super().save(*args, **kwargs)
+
+    @property
+    def image_src(self):
+        return _resolve_image_src(self.image_url)
 
     def is_in_stock(self):
         return self.stock > 0
