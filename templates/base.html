@@ -16,7 +16,13 @@
     <div class="container nav-inner">
       <a class="nav-brand" href="{% url 'home' %}">&#9998; CraftMarket</a>
 
-      <ul class="nav-links" role="list">
+      <button type="button" class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="primary-nav-links">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+
+      <ul class="nav-links" id="primary-nav-links" role="list">
         <li><a href="{% url 'product_list' %}">Browse</a></li>
 
         {% if user.is_authenticated %}
@@ -74,6 +80,7 @@
     </div>
   </footer>
 
+  <script src="{% static 'js/nav.js' %}" defer></script>
   {% block extra_js %}{% endblock %}
 
 </body>
