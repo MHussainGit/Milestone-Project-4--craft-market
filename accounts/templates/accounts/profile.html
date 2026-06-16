@@ -7,7 +7,7 @@
     <h1>My Profile</h1>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 2fr;gap:2rem;align-items:start">
+  <div class="profile-grid">
     <!-- Account details + shop info -->
     <div>
       <section class="card" style="padding:1.5rem;margin-bottom:1rem" aria-labelledby="account-heading">
@@ -51,30 +51,32 @@
     <section aria-labelledby="orders-heading">
       <h2 id="orders-heading" class="section-heading">Order History</h2>
       {% if orders %}
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Order</th>
-              <th scope="col">Date</th>
-              <th scope="col">Items</th>
-              <th scope="col">Total</th>
-              <th scope="col">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for order in orders %}
+        <div class="table-wrap">
+          <table class="table table-stacked">
+            <thead>
               <tr>
-                <td><a href="{% url 'order_detail' pk=order.pk %}">#{{ order.pk }}</a></td>
-                <td style="font-family:var(--font-ui);font-size:0.85rem">{{ order.created_at|date:"d M Y" }}</td>
-                <td style="font-family:var(--font-ui);font-size:0.85rem">{{ order.item_count }}</td>
-                <td style="font-family:var(--font-ui)">£{{ order.get_total }}</td>
-                <td>
-                  <span class="badge status-{{ order.status }}">{{ order.get_status_display }}</span>
-                </td>
+                <th scope="col">Order</th>
+                <th scope="col">Date</th>
+                <th scope="col">Items</th>
+                <th scope="col">Total</th>
+                <th scope="col">Status</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% for order in orders %}
+                <tr>
+                  <td data-label="Order"><a href="{% url 'order_detail' pk=order.pk %}">#{{ order.pk }}</a></td>
+                  <td data-label="Date" style="font-family:var(--font-ui);font-size:0.85rem">{{ order.created_at|date:"d M Y" }}</td>
+                  <td data-label="Items" style="font-family:var(--font-ui);font-size:0.85rem">{{ order.item_count }}</td>
+                  <td data-label="Total" style="font-family:var(--font-ui)">£{{ order.get_total }}</td>
+                  <td data-label="Status">
+                    <span class="badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       {% else %}
         <p class="text-muted" style="font-family:var(--font-ui)">
           No orders yet. <a href="{% url 'product_list' %}">Browse our products &rarr;</a>

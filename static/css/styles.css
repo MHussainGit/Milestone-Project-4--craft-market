@@ -315,6 +315,14 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
   border-bottom: 2px solid var(--border);
 }
 
+/* ── Profile layout ───────────────────────────────────────────────────────── */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  align-items: start;
+}
+
 /* ── Table ────────────────────────────────────────────────────────────────── */
 .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
@@ -502,6 +510,7 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
   .book-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
   .page-header { flex-direction: column; align-items: flex-start; }
   .search-form { flex-direction: column; }
+  .profile-grid { grid-template-columns: 1fr; }
 
   /* Stacked-card layout: each row becomes a labelled card */
   .table-stacked thead {
@@ -544,6 +553,18 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
     justify-content: flex-start;
   }
   .table-stacked td.order-actions .btn { flex: 1 1 auto; }
+
+  /* Footer total: drop the redundant standalone label cell; the value
+     cell carries its own data-label instead */
+  .table-stacked tfoot td[colspan] { display: none; }
+  .table-stacked tfoot td {
+    font-weight: bold;
+    background: var(--surface2);
+  }
+
+  /* Cells holding a form (cart quantity / remove) keep the control on the
+     right and let it wrap on very narrow screens */
+  .table-stacked td form { flex: 0 1 auto; justify-content: flex-end; }
 }
 
 @media (max-width: 480px) {

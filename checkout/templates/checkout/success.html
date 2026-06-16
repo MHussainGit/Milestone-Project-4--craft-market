@@ -11,32 +11,34 @@
     <div class="card" style="padding:1.5rem">
       <h1 style="font-size:1.3rem;margin-bottom:1rem">Order #{{ order.pk }}</h1>
 
-      <table class="table" aria-label="Order items">
-        <thead>
-          <tr>
-            <th scope="col">Product</th>
-            <th scope="col">Qty</th>
-            <th scope="col">Price</th>
-            <th scope="col">Subtotal</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in order.items.all %}
+      <div class="table-wrap">
+        <table class="table table-stacked" aria-label="Order items">
+          <thead>
             <tr>
-              <td>{{ item.product.title }}</td>
-              <td style="font-family:var(--font-ui)">{{ item.quantity }}</td>
-              <td style="font-family:var(--font-ui)">£{{ item.unit_price }}</td>
-              <td style="font-family:var(--font-ui);font-weight:600">£{{ item.get_line_total }}</td>
+              <th scope="col">Product</th>
+              <th scope="col">Qty</th>
+              <th scope="col">Price</th>
+              <th scope="col">Subtotal</th>
             </tr>
-          {% endfor %}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="3" style="text-align:right;font-weight:bold;font-family:var(--font-ui)">Total</td>
-            <td style="font-weight:bold;font-family:var(--font-ui)">£{{ order.get_total }}</td>
-          </tr>
-        </tfoot>
-      </table>
+          </thead>
+          <tbody>
+            {% for item in order.items.all %}
+              <tr>
+                <td data-label="Product">{{ item.product.title }}</td>
+                <td data-label="Qty" style="font-family:var(--font-ui)">{{ item.quantity }}</td>
+                <td data-label="Price" style="font-family:var(--font-ui)">£{{ item.unit_price }}</td>
+                <td data-label="Subtotal" style="font-family:var(--font-ui);font-weight:600">£{{ item.get_line_total }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" style="text-align:right;font-weight:bold;font-family:var(--font-ui)">Total</td>
+              <td data-label="Total" style="font-weight:bold;font-family:var(--font-ui)">£{{ order.get_total }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
 
       <div style="margin-top:1rem;font-family:var(--font-ui);font-size:0.9rem;color:var(--muted)">
         <p><strong>Delivery to:</strong><br>
