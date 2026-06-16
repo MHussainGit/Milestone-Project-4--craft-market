@@ -167,3 +167,27 @@ class ShopOwnerCrudTests(TestCase):
         self.client.login(username="other", password="pass")
         response = self.client.post(reverse("product_delete", kwargs={"slug": self.product.slug}))
         self.assertEqual(response.status_code, 403)
+
+    def test_product_delete_with_order_history_redirects_instead_of_500(self):
+        from checkout.models import Order, OrderItem
+
+        order = Order.objects.create(
+            user=self.owner,
+            full_name="Buyer",
+            email="buyer@example.com",
+            address_line1="1 Test St",
+            city="Testville",
+            postcode="TE1 1ST",
+            status="paid",
+        )
+        OrderItem.objects.create(
+            order=order, product=self.product, quantity=1, unit_price=self.product.price
+        )
+
+        self.client.login(username="owner", password="pass")
+        response = self.client.post(
+            reverse("product_delete", kwargs={"slug": self.product.slug}), follow=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Product.objects.filter(pk=self.product.pk).exists())

@@ -1,4 +1,6 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -136,6 +138,17 @@ class ProductDeleteView(ProductOwnerOrStaffMixin, DeleteView):
         ctx["object_name"] = str(self.object)
         ctx["cancel_url"] = reverse("product_detail", kwargs={"slug": self.object.slug})
         return ctx
+
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except ProtectedError:
+            messages.error(
+                self.request,
+                f'"{self.object}" cannot be deleted because it has order history. '
+                "Set its stock to 0 instead to stop new orders.",
+            )
+            return redirect("product_detail", slug=self.object.slug)
 
 
 class ShopCreateView(LoginRequiredMixin, CreateView):
