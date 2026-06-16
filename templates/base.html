@@ -1,11 +1,13 @@
 {% load static %}
+{% load inline_static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}CraftMarket{% endblock %} — Handmade Marketplace</title>
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  {# Inlined to keep the stylesheet off the critical render path (no render-blocking request) #}
+  <style>{% inline_static 'css/styles.css' %}</style>
   {% block extra_head %}{% endblock %}
 </head>
 <body>
