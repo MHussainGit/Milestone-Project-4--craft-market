@@ -316,6 +316,8 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
 }
 
 /* ── Table ────────────────────────────────────────────────────────────────── */
+.table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -329,6 +331,17 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
 }
 .table th { font-weight: 600; background: var(--surface2); }
 .table tr:hover { background: var(--bg); }
+
+/* Screen-reader-only utility */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ── Badges ───────────────────────────────────────────────────────────────── */
 .badge {
@@ -489,6 +502,48 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
   .book-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
   .page-header { flex-direction: column; align-items: flex-start; }
   .search-form { flex-direction: column; }
+
+  /* Stacked-card layout: each row becomes a labelled card */
+  .table-stacked thead {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+  .table-stacked tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .table-stacked tr:hover { background: var(--surface); }
+  .table-stacked td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+  .table-stacked tr td:last-child { border-bottom: 0; }
+  .table-stacked td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--muted);
+    text-align: left;
+    flex: 0 0 auto;
+  }
+  /* Actions row: stack the buttons full-width under their label */
+  .table-stacked td.order-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  .table-stacked td.order-actions .btn { flex: 1 1 auto; }
 }
 
 @media (max-width: 480px) {
