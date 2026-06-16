@@ -72,7 +72,7 @@ PRODUCTS = [
     ),
     (
         "woodlandcraft", "Carved Butter Spreader", "Woodwork", "14.00", 20, False,
-        "",
+        "https://images.unsplash.com/photo-1557687790-902ede7ab58c?w=400",
         "Slim, ergonomic spreader carved by hand from cherry wood.",
         "Cherry wood", False,
     ),
@@ -126,7 +126,7 @@ PRODUCTS = [
     ),
     (
         "sewnleather", "Personalised Luggage Tag", "Leather Goods", "22.00", 25, False,
-        "",
+        "https://images.unsplash.com/photo-1723879682996-7bcca70658d5?w=400",
         "Debossed with your initials (up to 3 characters) — a classic travel gift.",
         "Vegetable-tanned leather", True,
     ),
