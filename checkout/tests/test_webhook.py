@@ -12,7 +12,8 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from checkout.models import Order
+from checkout.models import Order, OrderItem
+from store.models import Category, Product, Shop
 
 User = get_user_model()
 
@@ -27,6 +28,19 @@ def _make_order(status="pending"):
         city="Webhookville",
         postcode="WH1 1WH",
         status=status,
+    )
+
+
+def _make_product(stock=10):
+    owner = User.objects.create_user(f"shopowner_{Product.objects.count()}", password="pass")
+    shop = Shop.objects.create(user=owner, name=f"Shop {Product.objects.count()}")
+    category = Category.objects.create(name=f"Category {Product.objects.count()}")
+    return Product.objects.create(
+        title=f"Product {Product.objects.count()}",
+        shop=shop,
+        category=category,
+        price="10.00",
+        stock=stock,
     )
 
 
@@ -75,6 +89,36 @@ class StripeWebhookTests(TestCase):
         order = _make_order(status="paid")
         response = self._post_webhook("payment_intent.succeeded", order.pk)
         self.assertEqual(response.status_code, 200)
+
+    def test_webhook_payment_succeeded_deducts_stock(self):
+        product = _make_product(stock=10)
+        order = _make_order(status="pending")
+        OrderItem.objects.create(order=order, product=product, quantity=3, unit_price=product.price)
+
+        self._post_webhook("payment_intent.succeeded", order.pk)
+
+        product.refresh_from_db()
+        self.assertEqual(product.stock, 7)
+
+    def test_webhook_does_not_double_deduct_stock_for_already_paid_order(self):
+        product = _make_product(stock=10)
+        order = _make_order(status="paid")
+        OrderItem.objects.create(order=order, product=product, quantity=3, unit_price=product.price)
+
+        self._post_webhook("payment_intent.succeeded", order.pk)
+
+        product.refresh_from_db()
+        self.assertEqual(product.stock, 10)
+
+    def test_webhook_stock_deduction_never_goes_negative(self):
+        product = _make_product(stock=2)
+        order = _make_order(status="pending")
+        OrderItem.objects.create(order=order, product=product, quantity=5, unit_price=product.price)
+
+        self._post_webhook("payment_intent.succeeded", order.pk)
+
+        product.refresh_from_db()
+        self.assertEqual(product.stock, 0)
 
     def test_webhook_invalid_signature_returns_400(self):
         with patch(

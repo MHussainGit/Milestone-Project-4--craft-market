@@ -6,6 +6,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from django.db.models import F
+from django.db.models.functions import Greatest
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -13,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from cart.utils import clear_cart, get_cart_items_from_session, get_cart_total
+from store.models import Product
 
 from .forms import ShippingForm
 from .models import Order, OrderItem
@@ -97,6 +100,28 @@ def create_payment_intent(request):
         return JsonResponse({"error": str(exc)}, status=400)
 
 
+def _deduct_stock(order):
+    for item in order.items.values("product_id", "quantity"):
+        Product.objects.filter(pk=item["product_id"]).update(
+            stock=Greatest(F("stock") - item["quantity"], 0)
+        )
+
+
+def _mark_order_paid(order):
+    """
+    Atomically transition the order from pending to paid and deduct stock.
+
+    The status filter makes this safe to call from both checkout_success and
+    the Stripe webhook — only the request that wins the pending->paid update
+    deducts stock, so a paid order is never double-deducted.
+    """
+    updated = Order.objects.filter(pk=order.pk, status="pending").update(status="paid")
+    if updated:
+        order.status = "paid"
+        _deduct_stock(order)
+    return bool(updated)
+
+
 def _record_card_details(order):
     """
     Fetch the card brand and last 4 digits from Stripe for display on the
@@ -120,9 +145,7 @@ def _record_card_details(order):
 @login_required
 def checkout_success(request, order_pk):
     order = get_object_or_404(Order, pk=order_pk, user=request.user)
-    if order.status == "pending":
-        order.status = "paid"
-        order.save(update_fields=["status"])
+    _mark_order_paid(order)
     _record_card_details(order)
     clear_cart(request.session)
     return render(request, "checkout/success.html", {"order": order})
@@ -153,9 +176,7 @@ def stripe_webhook(request):
         if order_pk:
             try:
                 order = Order.objects.get(pk=order_pk)
-                if order.status != "paid":
-                    order.status = "paid"
-                    order.save(update_fields=["status"])
+                if _mark_order_paid(order):
                     _send_order_confirmation(order)
                 _record_card_details(order)
             except Order.DoesNotExist:
