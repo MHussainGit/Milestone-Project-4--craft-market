@@ -10,4 +10,6 @@ urlpatterns = [
     path("webhook/stripe/", views.stripe_webhook, name="stripe_webhook"),
     path("orders/", views.order_list, name="order_list"),
     path("orders/<int:pk>/", views.order_detail, name="order_detail"),
+    path("orders/<int:pk>/resume/", views.order_resume, name="order_resume"),
+    path("orders/<int:pk>/delete/", views.order_delete, name="order_delete"),
 ]

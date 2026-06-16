@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
@@ -171,3 +172,33 @@ def order_list(request):
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk, user=request.user)
     return render(request, "checkout/order_detail.html", {"order": order})
+
+
+@login_required
+def order_resume(request, pk):
+    order = get_object_or_404(Order, pk=pk, user=request.user, status="pending")
+    request.session["pending_order_pk"] = order.pk
+    cart_items = [
+        {"product": item.product, "quantity": item.quantity, "line_total": item.get_line_total()}
+        for item in order.items.select_related("product")
+    ]
+    return render(request, "checkout/checkout.html", {
+        "cart_items": cart_items,
+        "total": order.get_total(),
+        "order": order,
+        "stripe_publishable_key": settings.STRIPE_PUBLISHABLE_KEY,
+        "payment_step": True,
+    })
+
+
+@login_required
+def order_delete(request, pk):
+    order = get_object_or_404(Order, pk=pk, user=request.user, status="pending")
+    if request.method == "POST":
+        order.delete()
+        messages.success(request, f"Order #{pk} was deleted.")
+        return redirect("order_list")
+    return render(request, "confirm_delete.html", {
+        "object_name": f"Order #{order.pk}",
+        "cancel_url": reverse("order_list"),
+    })
