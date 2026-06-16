@@ -17,6 +17,12 @@
         <span class="badge status-{{ order.status }}">{{ order.get_status_display }}</span>
       </div>
 
+      {% if order.card_last4 %}
+        <p class="text-muted mb-2" style="font-family:var(--font-ui);font-size:0.85rem">
+          <strong>Paid with:</strong> {{ order.card_brand|capfirst }} card ending in {{ order.card_last4 }}
+        </p>
+      {% endif %}
+
       <table class="table" aria-label="Order items">
         <thead>
           <tr>

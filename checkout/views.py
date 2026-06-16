@@ -97,12 +97,33 @@ def create_payment_intent(request):
         return JsonResponse({"error": str(exc)}, status=400)
 
 
+def _record_card_details(order):
+    """
+    Fetch the card brand and last 4 digits from Stripe for display on the
+    receipt. Only this non-sensitive metadata is stored — the full card
+    number and CVC never reach the Django application or database.
+    """
+    if not order.stripe_payment_intent_id or order.card_last4:
+        return
+    try:
+        intent = stripe.PaymentIntent.retrieve(
+            order.stripe_payment_intent_id, expand=["payment_method"]
+        )
+        card = intent.payment_method.card
+        order.card_brand = card.brand
+        order.card_last4 = card.last4
+        order.save(update_fields=["card_brand", "card_last4"])
+    except Exception:
+        logger.exception("Failed to fetch card details for order %s", order.pk)
+
+
 @login_required
 def checkout_success(request, order_pk):
     order = get_object_or_404(Order, pk=order_pk, user=request.user)
     if order.status == "pending":
         order.status = "paid"
         order.save(update_fields=["status"])
+    _record_card_details(order)
     clear_cart(request.session)
     return render(request, "checkout/success.html", {"order": order})
 
@@ -136,6 +157,7 @@ def stripe_webhook(request):
                     order.status = "paid"
                     order.save(update_fields=["status"])
                     _send_order_confirmation(order)
+                _record_card_details(order)
             except Order.DoesNotExist:
                 logger.error("Webhook: Order %s not found.", order_pk)
 

@@ -46,6 +46,9 @@
           {{ order.country }}
         </p>
         <p>A confirmation email has been sent to <strong>{{ order.email }}</strong>.</p>
+        {% if order.card_last4 %}
+          <p><strong>Paid with:</strong> {{ order.card_brand|capfirst }} card ending in {{ order.card_last4 }}</p>
+        {% endif %}
       </div>
     </div>
 

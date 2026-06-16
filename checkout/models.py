@@ -31,6 +31,8 @@ class Order(models.Model):
     country = models.CharField(max_length=100, default="United Kingdom")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     stripe_payment_intent_id = models.CharField(max_length=200, blank=True)
+    card_brand = models.CharField(max_length=20, blank=True)
+    card_last4 = models.CharField(max_length=4, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
