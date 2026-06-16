@@ -148,6 +148,28 @@ CSRF_TRUSTED_ORIGINS = [
     o for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split() if o
 ]
 
+# Headers that are safe in every environment (no effect on plain-HTTP dev).
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+X_FRAME_OPTIONS = "DENY"
+
+# HTTPS-only hardening. Gated on production (DEBUG=False) so that local
+# http://127.0.0.1 development keeps working — secure cookies aren't sent over
+# HTTP and SECURE_SSL_REDIRECT would force an unusable redirect loop locally.
+if not DEBUG:
+    # Heroku terminates TLS at its router and forwards the original scheme in
+    # this header; without it Django can't tell the request arrived over HTTPS.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # HSTS: tell browsers to only ever connect over HTTPS.
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
 # ── Stripe ────────────────────────────────────────────────────────────────────
 # All Stripe config lives here — change these env vars to switch between
 # test and live keys without modifying any other file.
