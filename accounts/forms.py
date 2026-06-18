@@ -3,7 +3,12 @@ Accounts forms — registration and login.
 """
 
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordResetForm,
+    SetPasswordForm,
+    UserCreationForm,
+)
 from django.contrib.auth import get_user_model
 
 from craftmarket.forms import StyledFormMixin
@@ -36,4 +41,14 @@ class RegisterForm(StyledFormMixin, UserCreationForm):
 
 class LoginForm(StyledFormMixin, AuthenticationForm):
     """Login form with styled widgets."""
+    pass
+
+
+class StyledPasswordResetForm(StyledFormMixin, PasswordResetForm):
+    """Password reset request form with the shared 'form-control' styling."""
+    pass
+
+
+class StyledSetPasswordForm(StyledFormMixin, SetPasswordForm):
+    """New-password form (reset confirm step) with 'form-control' styling."""
     pass

@@ -323,6 +323,22 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
   align-items: start;
 }
 
+/* ── Product detail layout ────────────────────────────────────────────────── */
+.book-detail-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* ── Checkout layout ──────────────────────────────────────────────────────── */
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 2rem;
+  align-items: start;
+}
+
 /* ── Table ────────────────────────────────────────────────────────────────── */
 .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
@@ -511,6 +527,14 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
   .page-header { flex-direction: column; align-items: flex-start; }
   .search-form { flex-direction: column; }
   .profile-grid { grid-template-columns: 1fr; }
+
+  /* Product detail: stack image above details */
+  .book-detail-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .book-detail-grid aside { max-width: 320px; margin: 0 auto; }
+
+  /* Checkout: stack order summary below the form, full width */
+  .checkout-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .checkout-grid .btn { width: 100%; }
 
   /* Stacked-card layout: each row becomes a labelled card */
   .table-stacked thead {

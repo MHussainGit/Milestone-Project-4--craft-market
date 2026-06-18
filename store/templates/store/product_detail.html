@@ -9,7 +9,7 @@
     <span aria-current="page">{{ product.title }}</span>
   </nav>
 
-  <div style="display:grid;grid-template-columns:260px 1fr;gap:2.5rem;align-items:start" class="book-detail-grid">
+  <div class="book-detail-grid">
     <aside>
       {% if product.image_url %}
         <img src="{{ product.image_src }}" alt="{{ product.title }}"
