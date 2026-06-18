@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Offline{% endblock %}
+
+{% block content %}
+<div class="container" style="text-align:center;padding:3rem 1rem">
+  <h1>You're offline</h1>
+  <p class="text-muted" style="max-width:32rem;margin:1rem auto">
+    CraftMarket can't reach the network right now. Check your connection and try
+    again — pages you've already visited may still be available.
+  </p>
+  <p style="margin-top:1.5rem">
+    <a href="{% url 'home' %}" class="btn btn-primary">Try again</a>
+  </p>
+</div>
+{% endblock %}
