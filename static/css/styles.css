@@ -339,6 +339,15 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
   align-items: start;
 }
 
+/* ── Shop detail layout ───────────────────────────────────────────────────── */
+.shop-detail-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2rem;
+  align-items: start;
+  margin-bottom: 2rem;
+}
+
 /* ── Table ────────────────────────────────────────────────────────────────── */
 .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
@@ -535,6 +544,10 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
   /* Checkout: stack order summary below the form, full width */
   .checkout-grid { grid-template-columns: 1fr; gap: 1.5rem; }
   .checkout-grid .btn { width: 100%; }
+
+  /* Shop detail: stack the shop image above its info */
+  .shop-detail-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .shop-detail-grid aside { max-width: 240px; margin: 0 auto; }
 
   /* Stacked-card layout: each row becomes a labelled card */
   .table-stacked thead {

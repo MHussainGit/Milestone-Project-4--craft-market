@@ -8,7 +8,7 @@
     <span aria-current="page">{{ shop.name }}</span>
   </nav>
 
-  <div style="display:grid;grid-template-columns:200px 1fr;gap:2rem;align-items:start;margin-bottom:2rem">
+  <div class="shop-detail-grid">
     <aside>
       {% if shop.image_url %}
         <img src="{{ shop.image_src }}" alt="{{ shop.name }}"
