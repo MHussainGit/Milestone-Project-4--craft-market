@@ -7,12 +7,17 @@ Pattern mirrors the FitTrack fitness-tracker reference implementation:
 - profile_delete_view requires a POST request for safety.
 """
 
+import logging
+
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from .forms import LoginForm, RegisterForm
+
+logger = logging.getLogger(__name__)
 
 
 def register_view(request):
@@ -69,3 +74,24 @@ def profile_delete_view(request):
         messages.success(request, "Your account has been deleted.")
         return redirect("home")
     return render(request, "accounts/profile_delete.html")
+
+
+class GracefulPasswordResetView(auth_views.PasswordResetView):
+    """Password reset that never 500s when the email fails to send.
+
+    The default view sends the reset email synchronously, so any SMTP
+    problem (provider outage, rejected recipient, rate limit) raises and
+    becomes a Server Error. Here we log the failure and still redirect to
+    the 'done' page — which also preserves the standard behaviour of not
+    revealing whether an email address has an account.
+    """
+
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except Exception:
+            logger.exception(
+                "Password reset email failed to send for %r",
+                form.cleaned_data.get("email"),
+            )
+            return redirect(self.get_success_url())

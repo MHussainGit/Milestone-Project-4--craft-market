@@ -13,7 +13,7 @@ urlpatterns = [
     # Django built-in password reset (4-step flow)
     path(
         "password-reset/",
-        auth_views.PasswordResetView.as_view(
+        views.GracefulPasswordResetView.as_view(
             form_class=StyledPasswordResetForm,
             extra_context={"title": "Reset Password"},
         ),
