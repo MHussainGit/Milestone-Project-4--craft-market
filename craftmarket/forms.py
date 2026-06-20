@@ -1,5 +1,5 @@
 """
-Shared form utilities used across all PageTurner apps.
+Shared form utilities used across all CraftMarket apps.
 
 Import StyledFormMixin into any app's forms.py to automatically apply
 the 'form-control' CSS class to all visible form fields.

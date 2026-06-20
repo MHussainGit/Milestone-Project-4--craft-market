@@ -1,5 +1,5 @@
 """
-PageTurner – root URL configuration.
+CraftMarket – root URL configuration.
 
 Each Django app owns its own urls.py and is included here with a
 consistent prefix.  URL names are defined in each app and referenced
