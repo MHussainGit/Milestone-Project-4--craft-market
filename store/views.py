@@ -177,6 +177,38 @@ class ShopUpdateView(LoginRequiredMixin, UpdateView):
         return get_object_or_404(Shop, user=self.request.user)
 
 
+class ShopDeleteView(LoginRequiredMixin, DeleteView):
+    model = Shop
+    template_name = "confirm_delete.html"
+    success_url = reverse_lazy("profile")
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Shop, user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["object_name"] = str(self.object)
+        ctx["cancel_url"] = reverse("shop_detail", kwargs={"slug": self.object.slug})
+        count = self.object.products.count()
+        if count:
+            ctx["extra_warning"] = (
+                f"This will also permanently delete the shop's "
+                f"{count} product listing{'' if count == 1 else 's'}."
+            )
+        return ctx
+
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except ProtectedError:
+            messages.error(
+                self.request,
+                f'"{self.object}" cannot be deleted because it has products with '
+                "order history. Set those products' stock to 0 instead.",
+            )
+            return redirect("shop_detail", slug=self.object.slug)
+
+
 class CategoryCreateView(StaffRequiredMixin, CreateView):
     model = Category
     template_name = "store/category_form.html"

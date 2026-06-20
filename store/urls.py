@@ -12,6 +12,7 @@ urlpatterns = [
     # Shop management (authenticated users with a shop)
     path("my-shop/create/", views.ShopCreateView.as_view(), name="shop_create"),
     path("my-shop/edit/", views.ShopUpdateView.as_view(), name="shop_edit"),
+    path("my-shop/delete/", views.ShopDeleteView.as_view(), name="shop_delete"),
     path("my-shop/products/new/", views.ProductCreateView.as_view(), name="product_create"),
     path("my-shop/products/<slug:slug>/edit/", views.ProductUpdateView.as_view(), name="product_edit"),
     path("my-shop/products/<slug:slug>/delete/", views.ProductDeleteView.as_view(), name="product_delete"),

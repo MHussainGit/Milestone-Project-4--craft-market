@@ -28,6 +28,7 @@
       {% endif %}
       {% if user == shop.user %}
         <a href="{% url 'shop_edit' %}" class="btn btn-secondary btn-sm">Edit Shop</a>
+        <a href="{% url 'shop_delete' %}" class="btn btn-danger btn-sm">Delete Shop</a>
       {% endif %}
     </div>
   </div>

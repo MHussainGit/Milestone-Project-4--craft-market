@@ -37,6 +37,7 @@
           <div style="display:flex;gap:0.5rem;margin-top:0.75rem">
             <a href="{% url 'product_create' %}" class="btn btn-primary btn-sm">+ Add Product</a>
             <a href="{% url 'shop_edit' %}" class="btn btn-secondary btn-sm">Edit Shop</a>
+            <a href="{% url 'shop_delete' %}" class="btn btn-danger btn-sm">Delete Shop</a>
           </div>
         {% else %}
           <p class="text-muted" style="font-family:var(--font-ui);font-size:0.9rem">
