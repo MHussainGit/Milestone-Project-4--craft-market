@@ -13,7 +13,7 @@
           <label for="{{ field.id_for_label }}">{{ field.label }}</label>
           {{ field }}
           {% if field.help_text %}
-            <span class="text-muted" style="font-size:0.8rem">{{ field.help_text }}</span>
+            <div class="text-muted" style="font-size:0.8rem">{{ field.help_text }}</div>
           {% endif %}
           {% for error in field.errors %}
             <span class="form-error" role="alert">{{ error }}</span>

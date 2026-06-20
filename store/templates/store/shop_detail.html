@@ -35,9 +35,9 @@
   <h2 class="section-heading">Products from {{ shop.name }}</h2>
 
   {% if products %}
-    <div class="book-grid" role="list">
+    <div class="book-grid">
       {% for product in products %}
-        <article class="card" role="listitem">
+        <article class="card">
           {% if product.image_url %}
             <img class="card-img" src="{{ product.image_src }}" alt="{{ product.title }}" loading="lazy">
           {% else %}

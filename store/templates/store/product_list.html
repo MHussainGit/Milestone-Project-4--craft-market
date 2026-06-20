@@ -18,7 +18,7 @@
 
   {% if categories %}
   <nav aria-label="Filter by category">
-    <ul class="category-list" role="list">
+    <ul class="category-list">
       <li>
         <a class="category-pill {% if not selected_category %}active{% endif %}"
            href="{% url 'product_list' %}">All</a>
@@ -36,9 +36,9 @@
   {% endif %}
 
   {% if products %}
-    <div class="book-grid" role="list">
+    <div class="book-grid">
       {% for product in products %}
-        <article class="card" role="listitem">
+        <article class="card">
           {% if product.image_url %}
             <img class="card-img" src="{{ product.image_src }}" alt="{{ product.title }}" loading="lazy">
           {% else %}
