@@ -36,8 +36,8 @@
             Your card details are handled securely by Stripe. We never store card numbers.
           </p>
           <div class="form-group" style="margin-top:1rem">
-            <label for="card-element">Card details</label>
-            <div id="card-element" aria-label="Card input"></div>
+            <label id="card-element-label">Card details</label>
+            <div id="card-element" role="group" aria-labelledby="card-element-label"></div>
             <div id="card-errors" role="alert" aria-live="assertive"></div>
           </div>
           <button id="pay-btn" class="btn btn-primary" style="margin-top:0.75rem">
