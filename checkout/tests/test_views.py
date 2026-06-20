@@ -7,10 +7,11 @@ Run with: pytest checkout/tests/test_views.py -v
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.core import mail
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from checkout.models import Order
+from checkout.models import Order, OrderItem
 from store.models import Product, Shop
 
 User = get_user_model()
@@ -92,6 +93,52 @@ class CheckoutViewTests(TestCase):
         self.client.login(username="checkoutuser", password="pass")
         response = self.client.get(reverse("checkout_cancel"))
         self.assertEqual(response.status_code, 200)
+
+
+class CheckoutSuccessEmailTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            "buyer", password="pass", email="buyer@example.com"
+        )
+        self.product = _make_product()
+
+    def _pending_order(self):
+        order = Order.objects.create(
+            user=self.user, full_name="Buyer", email="buyer@example.com",
+            address_line1="1 Craft St", city="Makerville", postcode="MA1 1KE",
+            status="pending",
+        )
+        OrderItem.objects.create(
+            order=order, product=self.product, quantity=1,
+            unit_price=self.product.price,
+        )
+        return order
+
+    def test_success_page_sends_confirmation_email(self):
+        order = self._pending_order()
+        self.client.login(username="buyer", password="pass")
+        mail.outbox = []
+        self.client.get(reverse("checkout_success", kwargs={"order_pk": order.pk}))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(order.email, mail.outbox[0].to)
+        self.assertIn(f"#{order.pk}", mail.outbox[0].subject)
+
+    def test_success_page_marks_order_paid(self):
+        order = self._pending_order()
+        self.client.login(username="buyer", password="pass")
+        self.client.get(reverse("checkout_success", kwargs={"order_pk": order.pk}))
+        order.refresh_from_db()
+        self.assertEqual(order.status, "paid")
+
+    def test_already_paid_order_does_not_resend_email(self):
+        order = self._pending_order()
+        order.status = "paid"
+        order.save()
+        self.client.login(username="buyer", password="pass")
+        mail.outbox = []
+        self.client.get(reverse("checkout_success", kwargs={"order_pk": order.pk}))
+        self.assertEqual(len(mail.outbox), 0)
 
 
 class OrderListTests(TestCase):

@@ -145,7 +145,11 @@ def _record_card_details(order):
 @login_required
 def checkout_success(request, order_pk):
     order = get_object_or_404(Order, pk=order_pk, user=request.user)
-    _mark_order_paid(order)
+    # Send the confirmation email from whichever path wins the pending->paid
+    # transition (this success page or the Stripe webhook). _mark_order_paid is
+    # atomic, so only the winner returns True — the email goes out exactly once.
+    if _mark_order_paid(order):
+        _send_order_confirmation(order)
     _record_card_details(order)
     clear_cart(request.session)
     return render(request, "checkout/success.html", {"order": order})
