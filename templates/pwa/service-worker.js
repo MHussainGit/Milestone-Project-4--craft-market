@@ -7,7 +7,7 @@
  *                     visits paint instantly and survive flaky networks.
  * Bump CACHE_VERSION to force clients onto a fresh cache after a deploy.
  */
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const CACHE_NAME = "craftmarket-" + CACHE_VERSION;
 const OFFLINE_URL = "{% url 'offline' %}";
 
